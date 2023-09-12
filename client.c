@@ -28,28 +28,27 @@ sem_t *clientSem;
 sem_t *serverSem;
 
 int main(void) {
-    serverSem = sem_open("serverSem", O_CREAT, 0777, 0);
-    clientSem = sem_open("clientSem", O_CREAT, 0777, 0);
+    serverSem = sem_open("serverSem", O_RDWR, 0777, 0);
+    clientSem = sem_open("clientSem", O_RDWR, 0777, 0);
 
     FILE *fp = fopen("file.txt", "r");
     int numbCount = 0;
     int buf;
+
     while (1) {
-        if (fscanf(fp, "%d", &buf) != 1) {
+        if (fscanf(fp, "%d", &buf) != 1)
             break;
-        }
+
         numbCount++;
-        if (fgetc(fp) == EOF) {
+        if (fgetc(fp) == EOF)
             break;
-        }
     }
 
     printf("%d\n", numbCount);
     fclose(fp);
     int *arr = calloc(numbCount, sizeof(int));
-    if (!arr) {
+    if (!arr)
         return 1;
-    }
 
     FILE *fr = fopen("file.txt", "r");
 
@@ -71,6 +70,10 @@ int main(void) {
     int fd = shm_open("shared_mem", O_RDWR, 0777);
     taskInfo = mmap(NULL, sizeof(task_info_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
+    for (int i = 0; i < numbCount; i++)
+        printf("%d ", sharedArr[i]);
+    putchar(10);
+
     taskInfo->isAsc = 1;
     taskInfo->numberCount = numbCount;
 
@@ -80,14 +83,16 @@ int main(void) {
 
     for (int i = 0; i < numbCount; i++)
         printf("%d ", sharedArr[i]);
+    putchar(10);
 
     free(arr);
 
-    munmap(taskInfo, (long) numbCount * (long) sizeof(int));
-    munmap(sharedArr, sizeof(task_info_t));
-
     close(fd);
+    munmap(taskInfo, (long) numbCount * (long) sizeof(int));
+
     close(fdArr);
+    munmap(sharedArr, sizeof(task_info_t));
     shm_unlink("array");
+
     return 0;
 }

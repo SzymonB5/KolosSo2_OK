@@ -5,7 +5,6 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILE 1)
 
 add_executable(ser server.c)
-
 add_executable(cli client.c)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
