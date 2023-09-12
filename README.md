@@ -1,1 +1,0 @@
-# KolosSo2_OK
